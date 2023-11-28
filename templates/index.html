@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Interval</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('update_interval', function(data) {
+            console.log('Received update_interval event:', data);
+            document.getElementById('interval').innerText = 'Custom Interval: ' + data.interval + ' seconds';
+        });
+
+        socket.on('quote', function(data) {
+            console.log('Received quote event:', data);
+            document.getElementById('quote').innerText = data.quote;
+
+            // Set the source for the audio element
+            document.getElementById('audio-source').src = data.audio_file;
+
+            // Play the audio
+            var audio = document.getElementById('audio');
+            audio.load();  // Reload the audio element
+            audio.play();
+        });
+    </script>
+</head>
+<body>
+    <h1 id="interval">Custom Interval: {{ interval }} seconds</h1>
+    <p id="quote">Waiting for a quote...</p>
+
+    <!-- Add this to your HTML file where you want to play the audio -->
+    <audio controls id="audio">
+        <source id="audio-source" src="" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Add a form to input custom interval -->
+    <form method="post" action="/set_interval">
+        <label for="intervalInput">Set Custom Interval (seconds):</label>
+        <input type="number" name="interval" id="intervalInput" value="{{ interval }}" required>        
+        <button type="submit">Set Interval</button>
+    </form>
+</body>
+</html>
